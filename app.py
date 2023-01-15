@@ -23,7 +23,7 @@ class BetsView(Resource):
             login = req_json["login"]
             password = req_json["password"]
             password = sha256((password+HASH_SALT).encode('utf-8')).hexdigest()
-            #cursor.execute(f"INSERT INTO users (login, pass_hash, balance) VALUES ('{login}', '{password}', 0)")
+            #cursor.execute(f"INSERT INTO users (login, pass_hash, balance) VALUES ('{login}', '{password}', 0)") <- not safe to do
             #cur.execute("SELECT * FROM userdata WHERE Name = %s;", (name,)) <- safe to do 
             cursor.execute("INSERT INTO users (login, pass_hash, balance) VALUES ('%s', '%s', 0);"%(login, password,))
             connection.commit()
