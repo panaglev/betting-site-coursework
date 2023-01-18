@@ -35,21 +35,15 @@ create_events = '''CREATE TABLE "events" (
 
 create_bets = '''CREATE TABLE "bets" (
 				"bet_id"	INTEGER NOT NULL UNIQUE,
+				"event_id"	INTEGER NOT NULL,
 				"user_id"	INTEGER NOT NULL,
+				"assume_win"	INTEGER NOT NULL,
 				"bet_amount"	INTEGER,
 				PRIMARY KEY("bet_id" AUTOINCREMENT),
-				FOREIGN KEY("user_id") REFERENCES "users"("user_id")
+				FOREIGN KEY("user_id") REFERENCES "users"("user_id"),
+				FOREIGN KEY("event_id") REFERENCES "events"("event_id")
 				);'''
 
-create_betsevents = '''CREATE TABLE "betsevents" (
-					"betsevents_id"	INTEGER NOT NULL UNIQUE,
-					"bets_id"	INTEGER NOT NULL,
-					"event_id"	INTEGER NOT NULL,
-					PRIMARY KEY("betsevents_id" AUTOINCREMENT),
-					FOREIGN KEY("event_id") REFERENCES "events"("event_id"),
-					FOREIGN KEY("bets_id") REFERENCES "bets"("bet_id")
-					);'''
-	
 with sqlite3.connect("coursework.db") as connection:
 	cursor = connection.cursor()
 	cursor.execute(create_users)
@@ -57,6 +51,5 @@ with sqlite3.connect("coursework.db") as connection:
 	cursor.execute(create_teams)
 	cursor.execute(create_events)
 	cursor.execute(create_bets)
-	cursor.execute(create_betsevents)
 	connection.commit()
 print("Done!")

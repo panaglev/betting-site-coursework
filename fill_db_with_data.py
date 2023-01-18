@@ -15,12 +15,12 @@ fill_teams = '''INSERT INTO teams (sport_id, team_name) VALUES
                 (4, "Navi"),
                 (5, "Lewis Hamilton");'''
 
-fill_events = '''INSERT INTO events (team1_id, team2_id, event_status) VALUES 
-                (1, 6, 0),
-                (2, 7, 0),
-                (3, 8, 0),
-                (4, 9, 0),
-                (5, 10, 0);'''
+fill_events = '''INSERT INTO events (team1_id, team2_id, event_status, winner) VALUES 
+                (1, 6, 1, NULL),
+                (2, 7, 1, NULL),
+                (3, 8, 2, 1),
+                (4, 9, 2, 2),
+                (5, 10, 2, 2);'''
 
 fill_users = '''INSERT INTO users (login, pass_hash, balance) VALUES 
                 ("Admin", "713bfda78870bf9d1b261f565286f85e97ee614efe5f0faf7c34e7ca4f65baca", 1000), 
@@ -29,17 +29,13 @@ fill_users = '''INSERT INTO users (login, pass_hash, balance) VALUES
                 ("Stalker_1337", "9bd384c77ed0641dd62109eff7ae2be206d02a4f221a483203501e4522a08019", 1000),
                 ("krytoy", "65e84be33532fb784c48129675f9eff3a682b27168c0ea744b2cf58ee02337c5", 1000);'''
 
-fill_bets = '''INSERT INTO bets (user_id, bet_amount) VALUES 
-                (2, 500),
-                (4, 200), 
-                (3, 1000),
-                (1, 123);'''
+fill_bets = '''INSERT INTO bets (event_id, user_id, bet_amount, assume_win) VALUES 
+                (1, 2, 500, 1),
+                (2, 4, 200, 2), 
+                (2, 3, 1000, 1),
+                (4, 1, 123, 1),
+                (5, 2, 400, 2);'''
 
-fill_betsevents = '''INSERT INTO betsevents (bets_id, event_id) VALUES
-                    (1, 2),
-                    (3, 1),
-                    (4, 5),
-                    (2, 3);'''
 
 with sqlite3.connect("coursework.db") as connection:
     cursor = connection.cursor()
@@ -48,6 +44,5 @@ with sqlite3.connect("coursework.db") as connection:
     cursor.execute(fill_events)
     cursor.execute(fill_users)
     cursor.execute(fill_bets)
-    cursor.execute(fill_betsevents)
     connection.commit()
 print("Done!")
