@@ -1,18 +1,41 @@
+import jwt
 import sqlite3
-from flask import request
+from flask import request, abort
 from flask_restx import Resource, Namespace
+
+SECRET = "etg64vtah7r6atw74afiar6jtw4rsetrset69c8s"
+
+def admin_required(func):
+    def wrapper(*args, **kwargs):
+        token = request.cookies.get("token")
+        data = jwt.decode(token, SECRET, "HS256")
+        if data['login'] not in ("Admin"):
+            abort(401)
+        return func(*args, **kwargs)
+    return wrapper
+
+def moder_required(func):
+    def wrapper(*args, **kwargs):
+        token = request.cookies.get("token")
+        data = jwt.decode(token, SECRET, "HS256")
+        if data['login'] not in ("Admin", "Vasya_Mask_of_Madness", "Stalker_1337"):
+            abort(401)
+        return func(*args, **kwargs)
+    return wrapper
 
 utils_ns = Namespace("utils")
 
 @utils_ns.route("/users") # moderators panel able to update and ban(delete) users, add events
-# Able for admin and moderators
+# Admin and moderators
 class UtilsUsers(Resource):
+    @moder_required
     def get(self):
         with sqlite3.connect("coursework.db") as connection:
             cursor = connection.cursor()
             cursor.execute("SELECT * FROM users")
             return cursor.fetchall(), 200 # 200 - OK
 
+    @moder_required
     def patch(self):
         req_json = request.get_json()
         with sqlite3.connect("coursework.db") as connection:
@@ -22,14 +45,9 @@ class UtilsUsers(Resource):
        
 
 @utils_ns.route("/events")
-# Able for admin and moderators
+# Admin and moderators
 class UtilsEvents(Resource):
-    def get(self):
-        with sqlite3.connect("coursework.db") as connection:
-            cursor = connection.cursor()
-            cursor.execute("SELECT * FROM events")
-            return cursor.fetchall()
-
+    @moder_required
     def post(self):
         req_json = request.get_json()
         with sqlite3.connect("coursework.db") as connection:
@@ -37,13 +55,25 @@ class UtilsEvents(Resource):
             cursor.execute("INSERT INTO events (team1_id, team2_id, event_status) VALUES (%d, %d, %d);"%(req_json["team1_id"], req_json["team2_id"], 1))
             return "", 201 # 201 - Created
 
+@utils_ns.route("/<string:username>")
+# Admin only
+class CheckBalance(Resource):
+    @admin_required
+    def get(self, username):
+        with sqlite3.connect("coursework.db") as connection:
+            cursor = connection.cursor()
+            cursor.execute("SELECT * FROM users WHERE login = '%s';"%(username))
+            return cursor.fetchall()
+
 @utils_ns.route("/payback")
+# Admin only
 class PaybackView(Resource):
     def get(self):
         pass
         # print all active bets just copy paste code from bets(I guess)
 
-    def patch(self):
+    @admin_required
+    def post(self):
         """Steps:
         Close event -> click button -> script goes thrugh bets and compare data  with 2 loops
 

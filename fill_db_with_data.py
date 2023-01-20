@@ -23,11 +23,11 @@ fill_events = '''INSERT INTO events (team1_id, team2_id, event_status, winner) V
                 (5, 10, 2, 2);'''
 
 fill_users = '''INSERT INTO users (login, pass_hash, balance) VALUES 
-                ("Admin", "713bfda78870bf9d1b261f565286f85e97ee614efe5f0faf7c34e7ca4f65baca", 1000), 
+                ("Admin", "d988fdf380f8ad79e48bd19782181ac28f59d7343009e2c16fd0054a8ddd5a38", 1000), 
                 ("Kolya_Tri_Uha", "05d49692b755f99c4504b510418efeeeebfd466892540f27acf9a31a326d6504", 1000),
                 ("Vasya_Mask_of_Madness", "c745dda06acd95763dd9604e15acebd0ca48a276f95d68c00233eb1acf37ed73", 1000),
                 ("Stalker_1337", "9bd384c77ed0641dd62109eff7ae2be206d02a4f221a483203501e4522a08019", 1000),
-                ("krytoy", "65e84be33532fb784c48129675f9eff3a682b27168c0ea744b2cf58ee02337c5", 1000);'''
+                ("krytoy", "35c162997f5351cbf45c8b1ddff997646189f6647c11a01d94dcec793fcd3126", 1000);'''
 
 fill_bets = '''INSERT INTO bets (event_id, user_id, bet_amount, assume_win) VALUES
                 (1, 1, 100, 1),

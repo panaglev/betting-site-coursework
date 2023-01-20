@@ -2,7 +2,7 @@ import sqlite3
 from flask import request, abort
 from flask_restx import Resource, Namespace
 
-edit_bets_ns = Namespace("edit-bets")
+edit_bets_ns = Namespace("edit-events")
 
 @edit_bets_ns.route("/")
 # Able to admin only! 

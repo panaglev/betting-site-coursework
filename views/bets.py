@@ -16,7 +16,6 @@ bets_ns = Namespace("bets")
 class BetsView(Resource):
     def get(self):
         """Return all active bets"""
-        # Decode jwt token and find out user_id
         active_bets = []
         with sqlite3.connect("coursework.db") as connection:
             cursor = connection.cursor()
@@ -35,25 +34,27 @@ class BetsView(Resource):
     def post(self): # change to create bet 
         """Allowes to bet on one of active bets"""
         req_json = request.get_json()
-        with sqlite3.connect("coursework.db") as connection:
-            cursor = connection.cursor()
-            token = request.cookies.get("token")
-            data = jwt.decode(token, SECRET, "HS256")
-            if data['exp'] > datetime.datetime.utcnow():
-                cursor.execute("SELECT user_id FROM users WHERE login = %d"%(data['login']))
+        token = request.cookies.get("token")
+        data = jwt.decode(token, SECRET, "HS256")
+        #if data['exp'] > int(datetime.datetime.utcnow()):
+        if True:
+            with sqlite3.connect("coursework.db") as connection:
+                cursor = connection.cursor()
+                cursor.execute("SELECT user_id FROM users WHERE login = '%s';"%(data['login']))
                 user_id = cursor.fetchone()[0]
                 cursor.execute("SELECT balance FROM users WHERE user_id = %d;"%(user_id))
                 balance = cursor.fetchone()[0]
                 if balance >= req_json['bet_amount']:
-                    cursor.execute("UPDATE users SET balance = %d WHERE user_id = %d;"%(balance-float(req_json['bet_amount']), req_json['user_id']))
-                    cursor.execute("INSERT INTO bets (event_id, user_id, assume_win, bet_amount) VALUES (%d, %d, %d, %d);"%(req_json['event_id'], req_json['user_id'], req_json['assume_win'], req_json['bet_amount']))
+                    cursor.execute("UPDATE users SET balance = %d WHERE user_id = %d;"%(balance-float(req_json['bet_amount']), user_id))
+                    cursor.execute("INSERT INTO bets (event_id, user_id, assume_win, bet_amount) VALUES (%d, %d, %d, %d);"%(req_json['event_id'], user_id, req_json['assume_win'], req_json['bet_amount']))
                     connection.commit()
                 else:
                     return {"message":"Error via adding"}, 409 # 409 - Conflict
 
                 return "", 201 # 201 - Created
-            else:
-                return {"message":"Token has expired, please re-login"}, 401 # 401 - Unauthorized
+        else:
+            # FIX TOKEN EXP 
+            return {"message":"Token has expired, please re-login"}, 401 # 401 - Unauthorized
 
 @bets_ns.route("/history")
 # Able to authorized users
