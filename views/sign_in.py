@@ -19,7 +19,6 @@ class SignInView(Resource):
         with sqlite3.connect("coursework.db") as connection:
             cursor = connection.cursor()
             password = sha256((req_json['password']+HASH_SALT).encode('utf-8')).hexdigest()
-            print(password)
             cursor.execute("SELECT * FROM users WHERE login = '%s' and pass_hash = '%s';"%(req_json['login'], password))
             if cursor.fetchall() != []:
                 token = jwt.encode({'login':req_json['login'], 'exp':datetime.datetime.utcnow()+datetime.timedelta(minutes=30)}, SECRET)

@@ -5,9 +5,18 @@ import sqlite3
 import datetime
 from hashlib import sha256
 from flask_restx import Resource, Namespace
-from flask import request, render_template, make_response
+from flask import request, render_template, make_response, abort
 
 SECRET = "etg64vtah7r6atw74afiar6jtw4rsetrset69c8s"
+
+def auth_required(func): 
+    def wrapper(*args, **kwargs):
+        token = request.cookies.get("token")
+        data = jwt.decode(token, SECRET, "HS256")
+        if not data:
+            abort(401)
+        return func(*args, **kwargs)
+    return wrapper
 
 bets_ns = Namespace("bets")
 
