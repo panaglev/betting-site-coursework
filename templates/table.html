@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+table {
+  font-family: arial, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+td, th {
+  border: 1px solid #000000;
+  text-align: left;
+  padding: 8px;
+}
+
+</style>
+</head>
+<body>
+
+<h2>Bets</h2>
+
+<table>
+  <tr>
+    <th>Team 1</th>
+    <th>Team 2</th>
+    <th>Amount Bet team 1</th>
+    <th>Amount Bet team 2</th>
+    <th>Winner</th>
+  </tr>
+  {% for bet in bets %}
+  <tr>
+      <td>{{ bets.team1 }}</td>
+      <td>{{ bet.team2 }}</td>
+      <td>{{ bet.amount1 }}</td>
+      <td>{{ bet.amount2 }}</td>
+      <td>{{ bet.winner }}</td>
+  </tr>
+  {% endfor %}
+</table>
+
+</body>
+</html>

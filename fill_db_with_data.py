@@ -29,12 +29,25 @@ fill_users = '''INSERT INTO users (login, pass_hash, balance) VALUES
                 ("Stalker_1337", "9bd384c77ed0641dd62109eff7ae2be206d02a4f221a483203501e4522a08019", 1000),
                 ("krytoy", "65e84be33532fb784c48129675f9eff3a682b27168c0ea744b2cf58ee02337c5", 1000);'''
 
-fill_bets = '''INSERT INTO bets (event_id, user_id, bet_amount, assume_win) VALUES 
-                (1, 2, 500, 1),
-                (2, 4, 200, 2), 
-                (2, 3, 1000, 1),
-                (4, 1, 123, 1),
-                (5, 2, 400, 2);'''
+fill_bets = '''INSERT INTO bets (event_id, user_id, bet_amount, assume_win) VALUES
+                (1, 1, 100, 1),
+                (1, 2, 200, 2),
+                (1, 3, 300, 2),
+                (1, 4, 400, 1),
+                (1, 5, 500, 1),
+                (3, 1, 100, 2),
+                (3, 2, 200, 1),
+                (3, 3, 300, 1),
+                (3, 4, 400, 2),
+                (3, 5, 500, 2);'''
+
+#fill_bets = '''INSERT INTO bets (event_id, user_id, bet_amount, assume_win) VALUES 
+#                (1, 2, 500, 1),
+#                (2, 4, 200, 2), 
+#                (2, 3, 1000, 1),
+#                (4, 1, 123, 1),
+#                (4, 2, 321, 1),
+#                (5, 2, 400, 2);'''
 
 
 with sqlite3.connect("coursework.db") as connection:
