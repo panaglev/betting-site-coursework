@@ -7,12 +7,10 @@ from hashlib import sha256
 from flask_restx import Resource, Namespace
 from flask import request, render_template, make_response, abort
 
-SECRET = "etg64vtah7r6atw74afiar6jtw4rsetrset69c8s"
-
 def auth_required(func): 
     def wrapper(*args, **kwargs):
         token = request.cookies.get("token")
-        data = jwt.decode(token, SECRET, "HS256")
+        data = jwt.decode(token, os.environ.get('SECRET'), "HS256")
         if not data:
             abort(401)
         return func(*args, **kwargs)
@@ -21,8 +19,8 @@ def auth_required(func):
 bets_ns = Namespace("bets")
 
 @bets_ns.route("/") # display all active bets
-# Able to all users event not authorized
 class BetsView(Resource):
+    @auth_required
     def get(self):
         """Return all active bets"""
         active_bets = []
@@ -40,11 +38,12 @@ class BetsView(Resource):
             return active_bets, 200
                 
             
+    @auth_required
     def post(self): # change to create bet 
         """Allowes to bet on one of active bets"""
         req_json = request.get_json()
         token = request.cookies.get("token")
-        data = jwt.decode(token, SECRET, "HS256")
+        data = jwt.decode(token, os.environ.get('SECRET'), "HS256")
         #if data['exp'] > int(datetime.datetime.utcnow()):
         if True:
             with sqlite3.connect("coursework.db") as connection:
@@ -53,12 +52,13 @@ class BetsView(Resource):
                 user_id = cursor.fetchone()[0]
                 cursor.execute("SELECT balance FROM users WHERE user_id = %d;"%(user_id))
                 balance = cursor.fetchone()[0]
+                print(balance)
                 if balance >= req_json['bet_amount']:
                     cursor.execute("UPDATE users SET balance = %d WHERE user_id = %d;"%(balance-float(req_json['bet_amount']), user_id))
                     cursor.execute("INSERT INTO bets (event_id, user_id, assume_win, bet_amount) VALUES (%d, %d, %d, %d);"%(req_json['event_id'], user_id, req_json['assume_win'], req_json['bet_amount']))
                     connection.commit()
                 else:
-                    return {"message":"Error via adding"}, 409 # 409 - Conflict
+                    return {"message":"Not enough money on balance to make a bet"}, 409 # 409 - Conflict
 
                 return "", 201 # 201 - Created
         else:
@@ -66,10 +66,9 @@ class BetsView(Resource):
             return {"message":"Token has expired, please re-login"}, 401 # 401 - Unauthorized
 
 @bets_ns.route("/history")
-# Able to authorized users
 class MyBetsView(Resource): # rework to more complex sql query -> less code 
     def get(self):
-        """Return all bets being played"""
+        """All bets being played"""
         users_bets = []
         with sqlite3.connect("coursework.db") as connection:
             cursor = connection.cursor()
