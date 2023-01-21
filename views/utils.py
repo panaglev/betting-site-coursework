@@ -56,6 +56,7 @@ class UtilsEvents(Resource):
 
 @utils_ns.route("/payback")
 class PaybackView(Resource):
+    admins_profit = 0
     @admin_required
     def post(self):
         """Pay when event was over"""
