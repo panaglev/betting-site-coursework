@@ -15,8 +15,7 @@ class SignUpView(Resource):
         req_json = request.get_json()
         with sqlite3.connect("coursework.db") as connection:
             cursor = connection.cursor()
-            password = req_json['password']
-            password = sha256((password+os.environ.get('HASH_SALT')).encode('utf-8')).hexdigest()
+            password = sha256((req_json['password']+os.environ.get('HASH_SALT')).encode('utf-8')).hexdigest()
 
             # Check if user already in db to avoid Broken Access controll
             # Top 1 of vulns by OWASP Top 10 

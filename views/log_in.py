@@ -15,7 +15,7 @@ class SignInView(Resource):
         req_json = request.get_json()
         with sqlite3.connect("coursework.db") as connection:
             cursor = connection.cursor()
-            password = sha256((password+os.environ.get('HASH_SALT')).encode('utf-8')).hexdigest()
+            password = sha256((req_json['password']+os.environ.get('HASH_SALT')).encode('utf-8')).hexdigest()
             
             # Check if the user exists
             cursor.execute("SELECT * FROM users WHERE login = '%s' and pass_hash = '%s';"%(req_json['login'], password))
