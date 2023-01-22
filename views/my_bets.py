@@ -38,7 +38,6 @@ class MyBetsPaidView(Resource):
                     cursor.execute("SELECT team_name FROM teams WHERE team_id = %d;"%(team2_id))
                     team2 = cursor.fetchone()[0]
                     if winner is None:
-                        print(winner)
                         user_bets.append(f"In progress {team1} vs {team2}")
                     else:
                         continue
@@ -50,7 +49,6 @@ class MyBetsPaidView(Resource):
                     team1 = cursor.fetchone()[0]
                     cursor.execute("SELECT team_name FROM teams WHERE team_id = %d;"%(team2_id))
                     team2 = cursor.fetchone()[0]
-                    print(team1, team2, winner)
                     if winner == 1:
                         user_bets.append(f"{team1} was playing agains {team2} and {team1} won")
                     elif winner == 2:

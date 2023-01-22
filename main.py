@@ -23,7 +23,6 @@ def configure_app(app):
 if __name__ == "__main__":
     app = create_app()
     configure_app(app)
-    app.run(debug=True)
-
+    app.run(debug=True, host='0.0.0.0')
     #export HASH_SALT="9fc47da85894433819877a9d0e3f01f6ff35afeb25cc6058d138284abd3a050b"
     #export SECRET="etg64vtah7r6atw74afiar6jtw4rsetrset69c8s"
