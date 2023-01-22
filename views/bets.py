@@ -39,7 +39,7 @@ class BetsView(Resource):
                 
             
     @auth_required
-    def post(self): # change to create bet 
+    def post(self):
         """Allowes to bet on one of active bets"""
         req_json = request.get_json()
         token = request.cookies.get("token")
@@ -52,7 +52,6 @@ class BetsView(Resource):
                 user_id = cursor.fetchone()[0]
                 cursor.execute("SELECT balance FROM users WHERE user_id = %d;"%(user_id))
                 balance = cursor.fetchone()[0]
-                print(balance)
                 if balance >= req_json['bet_amount']:
                     cursor.execute("UPDATE users SET balance = %d WHERE user_id = %d;"%(balance-float(req_json['bet_amount']), user_id))
                     cursor.execute("INSERT INTO bets (event_id, user_id, assume_win, bet_amount) VALUES (%d, %d, %d, %d);"%(req_json['event_id'], user_id, req_json['assume_win'], req_json['bet_amount']))
@@ -60,13 +59,13 @@ class BetsView(Resource):
                 else:
                     return {"message":"Not enough money on balance to make a bet"}, 409 # 409 - Conflict
 
-                return "", 201 # 201 - Created
+                return {"message":"Successfull"}, 201 # 201 - Created
         else:
             # FIX TOKEN EXP 
             return {"message":"Token has expired, please re-login"}, 401 # 401 - Unauthorized
 
 @bets_ns.route("/history")
-class MyBetsView(Resource): # rework to more complex sql query -> less code 
+class MyBetsView(Resource): 
     def get(self):
         """All bets being played"""
         users_bets = []

@@ -5,28 +5,23 @@ import requests
 
 SECRET = "etg64vtah7r6atw74afiar6jtw4rsetrset69c8s"
 
-chelyad_greeting = """Welcome back {nickname}!
-Please enter what do you want to do:
+chelyad_greeting = """Please enter what do you want to do:
 1. List all available bets
 2. Make a bet
 3. See bets history
-4. See my bets(paid)
-5. See my best(active)
+4. See my bets
 0. Exit"""
 
-moderator_greeting = """Welcome buddy!
-Please enter what do you want to do:
+moderator_greeting = """Please enter what do you want to do:
 1. List all available bets
 2. Make a bet
 3. See bets history
-4. See my bets(paid)
-5. See my best(active)
-6. Moderate users
-7. Create event
+4. See my bets
+5. Moderate users
+6. Create event
 0. Exit"""
 
-admin_greeting = """Welcome our lord!
-Let us make your wish come true
+admin_greeting = """Let us make your wish come true
 1. List all available bets
 2. Make a bet
 3. See bets history
@@ -68,6 +63,7 @@ def main():
 
     data = jwt.decode(token, SECRET, "HS256")
     if data['login'] == 'Admin':
+        print(f"Welcome back {data['login']}")
         while flag:
             print(admin_greeting)
             select = int(input("Make your choise lord: "))
@@ -82,17 +78,15 @@ def main():
                 case 4:
                     list_my_bets(token)
                 case 5:
-                    list_my_active_bets(token)
-                    pass
-                case 6:
                     moderate_users(token)
-                case 7:
+                case 6:
                     create_event(token)
-                case 8:
+                case 7:
                     make_payback(token)
                 case 0:
                     sys.exit()
     elif data['login'] in ("Vasya_Mask_of_Madness", "Stalker_1337"):
+        print(f"Welcome back {data['login']}")
         while flag:
             print(moderator_greeting)
             select = int(input("Make your choise buddy: "))
@@ -106,14 +100,13 @@ def main():
                 case 4:
                     list_my_bets(token)
                 case 5:
-                    list_my_active_bets(token)
-                case 6:
                     moderate_users(token)
-                case 7:
+                case 6:
                     create_event(token)
                 case 0:
                     sys.exit()
     else:
+        print(f"Welcome back {data['login']}")
         while flag:
             print(chelyad_greeting)
             select = int(input("Make your choise: "))
@@ -126,8 +119,6 @@ def main():
                     see_bets_history()
                 case 4:
                     list_my_bets(token)
-                case 5:
-                    list_my_active_bets(token)
                 case 0:
                     sys.exit()
 
@@ -158,15 +149,16 @@ def see_bets_history():
 
 def list_my_bets(token):
     """List all my bets"""
-    cookie = {"token":token}
-    r = requests.get("http://127.0.0.1:5000/my-bets/paid", cookies=cookie)
-    print(r.json())
-    #print(r.text)
-
-def list_my_active_bets(token):
-    cookie = {"token":token}
-    r = requests.get("http://127.0.0.1:5000/my-bets/active", cookies=cookie)
-    print(r.json())
+    select = int(input("""1. See active bets \n2. See paid bets"""))
+    match select:
+        case 1:
+            cookie = {"token":token}
+            r = requests.get("http://127.0.0.1:5000/my-bets/active", cookies=cookie)
+            print(r.json())
+        case 2:
+            cookie = {"token":token}
+            r = requests.get("http://127.0.0.1:5000/my-bets/paid", cookies=cookie)
+            print(r.json())
 
 def moderate_users(token):
     select = int(input("""1. List users
