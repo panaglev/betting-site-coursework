@@ -58,61 +58,90 @@ def main():
         except KeyboardInterrupt:
             print("Bye!")
             sys.exit()
-
-        token = ""
-        match choise:
-            case 1:
-                os.system("clear")
-                print(prog_greeting)
-                try:
-                    login = input("Enter login: ")
-                    password = pwinput.pwinput(prompt='Password: ')
-                    credentials = {
-                        'login': login,
-                        'password': password,
-                    }
+        except ValueError: # FIX RETURN TO ENTER NUMBER NOT CRASH
+            print("Enter number value")
+        else:
+            token = ""
+            match choise:
+                case 1:
+                    os.system("clear")
+                    print(prog_greeting)
                     try:
-                        r = requests.post('http://127.0.0.1:5000/log-in', json=credentials)
-                        token = r.cookies.get_dict()['token']
-                    except:
-                        print("Something went wrong")
+                        login = input("Enter login: ")
+                        password = pwinput.pwinput(prompt='Password: ')
+                        credentials = {
+                            'login': login,
+                            'password': password,
+                        }
+                        try:
+                            r = requests.post('http://127.0.0.1:5000/log-in', json=credentials)
+                            token = r.cookies.get_dict()['token']
+                        except:
+                            print("Something went wrong")
+                            sys.exit()
+                    except KeyboardInterrupt:
+                        print("Bye!")
                         sys.exit()
-                except KeyboardInterrupt:
-                    print("Bye!")
-                    sys.exit()
-            case 2:
-                os.system("clear")
-                print(prog_greeting)
-                print("oh, sweety, it's ur first time. . .")
-                try:
-                    login = input("Enter login: ")
-                    password = pwinput.pwinput(prompt='Password: ')
-                    credentials = {
-                        'login': login,
-                        'password': password,
-                    }
+                case 2:
+                    os.system("clear")
+                    print(prog_greeting)
+                    print("oh, sweety, it's ur first time. . .")
                     try:
-                        r = requests.post('http://127.0.0.1:5000/sign-up', json=credentials)
-                        token = r.cookies.get_dict()['token']
-                    except:
-                        print("Something went wrong")
+                        login = input("Enter login: ")
+                        password = pwinput.pwinput(prompt='Password: ')
+                        credentials = {
+                            'login': login,
+                            'password': password,
+                        }
+                        try:
+                            r = requests.post('http://127.0.0.1:5000/sign-up', json=credentials)
+                            token = r.cookies.get_dict()['token']
+                        except:
+                            print("Something went wrong")
+                            sys.exit()
+                    except KeyboardInterrupt:
+                        print("Bye!")
                         sys.exit()
-                except KeyboardInterrupt:
-                    print("Bye!")
+                case 0:
                     sys.exit()
-            case 0:
-                sys.exit()
 
-        data = jwt.decode(token, os.environ.get('SECRET'), "HS256")
-        if data['login'] == 'Admin':
-            os.system("clear")
-            while flag:
-                print(prog_greeting)
-                balance = get_users_balance(token)
-                print(f"Welcome back {data['login']} with balance {balance}")
-                print(admin_greeting)
-                try:
-                    select = int(input("Make your choise lord: "))
+            data = jwt.decode(token, os.environ.get('SECRET'), "HS256")
+            if data['login'] == 'Admin':
+                os.system("clear")
+                while flag:
+                    print(prog_greeting)
+                    balance = get_users_balance(token)
+                    print(f"Welcome back {data['login']} with balance {balance}")
+                    print(admin_greeting)
+                    try:
+                        select = int(input("Make your choise lord: "))
+                        match select:
+                            case 1:
+                                list_bets(token)
+                            case 2:
+                                make_a_bet(token)
+                            case 3:
+                                see_bets_history()
+                            case 4:
+                                list_my_bets(token)
+                            case 5:
+                                moderate_users(token)
+                            case 6:
+                                create_event(token)
+                            case 7:
+                                make_payback(token)
+                            case 0:
+                                sys.exit()
+                    except KeyboardInterrupt:
+                        print("Bye!")
+                        sys.exit()
+            elif data['login'] in ("Vasya_Mask_of_Madness", "Stalker_1337"):
+                os.system("clear")
+                while flag:
+                    balance = get_users_balance(token)
+                    print(f"Welcome back {data['login']} with balanve of {balance}")
+                    print(moderator_greeting)
+                    select = int(input("Make your choise buddy: "))
                     match select:
                         case 1:
                             list_bets(token)
@@ -126,55 +155,28 @@ def main():
                             moderate_users(token)
                         case 6:
                             create_event(token)
-                        case 7:
-                            make_payback(token)
                         case 0:
                             sys.exit()
-                except KeyboardInterrupt:
-                    print("Bye!")
-                    sys.exit()
-        elif data['login'] in ("Vasya_Mask_of_Madness", "Stalker_1337"):
-            os.system("clear")
-            while flag:
-                balance = get_users_balance(token)
-                print(f"Welcome back {data['login']} with balanve of {balance}")
-                print(moderator_greeting)
-                select = int(input("Make your choise buddy: "))
-                match select:
-                    case 1:
-                        list_bets(token)
-                    case 2:
-                        make_a_bet(token)
-                    case 3:
-                        see_bets_history()
-                    case 4:
-                        list_my_bets(token)
-                    case 5:
-                        moderate_users(token)
-                    case 6:
-                        create_event(token)
-                    case 0:
-                        sys.exit()
-        else:
-            os.system("clear")
-            while flag:
-                print(prog_greeting)
-                balance = get_users_balance(token)
-                print(f"Welcome back {data['login']} with balance of {balance}")
-                print(chelyad_greeting)
-                select = int(input("Make your choise: "))
-                match select:
-                    case 1:
-                        list_bets(token)
-                    case 2:
-                        make_a_bet(token) 
-                    case 3:
-                        see_bets_history()
-                    case 4:
-                        list_my_bets(token)
-                    case 0:
-                        print("Hope 2 see u again")
-                        sys.exit()
+            else:
+                os.system("clear")
+                while flag:
+                    print(prog_greeting)
+                    balance = get_users_balance(token)
+                    print(f"Welcome back {data['login']} with balance of {balance}")
+                    print(chelyad_greeting)
+                    select = int(input("Make your choise: "))
+                    match select:
+                        case 1:
+                            list_bets(token)
+                        case 2:
+                            make_a_bet(token) 
+                        case 3:
+                            see_bets_history()
+                        case 4:
+                            list_my_bets(token)
+                        case 0:
+                            print("Hope 2 see u again")
+                            sys.exit()
 
 def list_bets(token):
     """List all available bets"""

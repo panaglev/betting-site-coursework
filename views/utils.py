@@ -66,7 +66,7 @@ class UtilsEvents(Resource):
 
 @utils_ns.route("/payback")
 class PaybackView(Resource):
-    admins_profit = 0
+    admins_profit = 0 
     @admin_required
     def post(self):
         """Pay when event was over"""
@@ -79,7 +79,7 @@ class PaybackView(Resource):
             cursor.execute("UPDATE events SET winner = %d WHERE event_id = %d"%(req_json['winner'], req_json['event_id'])) 
             cursor.execute("UPDATE events SET event_status = %d WHERE event_id = %d;"%(2, req_json['event_id']))
 
-            cursor.execute("SELECT * FROM bets WHERE event_id = %d;"%(req_json['event_id']))
+            cursor.execute("SELECT * FROM bets WHERE event_id = %d;"%(req_json['event_id'])) # Select all users bet on the event
             res = cursor.fetchall()
             for i in res:
                 _, _, _, assume_win, bet_amount = i
@@ -88,38 +88,30 @@ class PaybackView(Resource):
                 else:
                     amount2 += bet_amount
 
-            admins_profit = 0
+            admins_profit = 0 
             admins_profit += (amount1 + amount2)
 
-            payback_coef = 0.0
+            payback_coef = 0.0 # Calculate coeffs
             if req_json['winner'] == 1:
                 payback_coef = 1 + (round(amount2/amount1, 2) - 0.05) # money formula
             else:
                 payback_coef = 1 + (round(amount1/amount2, 2) - 0.05) # money formula
-        
-            for i in res:
+
+            for i in res: # Iterate users who bet on this event
                 _, _, user_id, assume_win, bet_amount = i
                 if assume_win == req_json['winner']:
+                    to_pay = bet_amount * payback_coef
                     admins_profit -= to_pay
                     cursor.execute("SELECT balance FROM users WHERE user_id = %d;"%(user_id))
                     balance = cursor.fetchone()[0]
-                    to_pay += balance
-                    to_pay = bet_amount * payback_coef
+                    balance += to_pay
                     #cursor.execute("UPDATE users SET balance %f WHERE user_id = %d")
-                    cursor.execute(f"UPDATE users SET balance = {to_pay} WHERE user_id = {user_id}") # FIX WHEN FIND PLACEHOLDER FOR REAL NUMBER 
+                    cursor.execute(f"UPDATE users SET balance = {balance} WHERE user_id = {user_id}") # FIX WHEN FIND PLACEHOLDER FOR REAL NUMBER 
                 else:
                     continue
 
-        return admins_profit, 201
+        return "", 201
     
-@utils_ns.route("/admin-profit")
-class ProfitView(Resource):
-    @admin_required
-    def get(self):
-        """See site profit"""
-        global admins_profit
-        return admins_profit
-
 @utils_ns.route("/balance")
 class GetBalanceView(Resource):
     @auth_required

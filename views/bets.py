@@ -18,7 +18,7 @@ def auth_required(func):
 
 bets_ns = Namespace("bets")
 
-@bets_ns.route("/") # display all active bets
+@bets_ns.route("/")
 class BetsView(Resource):
     @auth_required
     def get(self):
