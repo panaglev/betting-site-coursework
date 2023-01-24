@@ -22,6 +22,15 @@ def moder_required(func):
         return func(*args, **kwargs)
     return wrapper
 
+def auth_required(func): 
+    def wrapper(*args, **kwargs):
+        token = request.cookies.get("token")
+        data = jwt.decode(token, os.environ.get('SECRET'), "HS256")
+        if not data:
+            abort(401)
+        return func(*args, **kwargs)
+    return wrapper
+
 utils_ns = Namespace("utils")
 
 @utils_ns.route("/users")
@@ -104,7 +113,19 @@ class PaybackView(Resource):
     
 @utils_ns.route("/admin-profit")
 class ProfitView(Resource):
+    @admin_required
     def get(self):
         """See site profit"""
         global admins_profit
         return admins_profit
+
+@utils_ns.route("/balance")
+class GetBalanceView(Resource):
+    @auth_required
+    def get(self):
+        with sqlite3.connect("coursework.db") as connection:
+            cursor = connection.cursor() 
+            token = request.cookies.get("token")
+            data = jwt.decode(token, os.environ.get('SECRET'), "HS256")
+            cursor.execute("SELECT balance FROM users WHERE login = '%s';"%(data['login']))
+            return cursor.fetchone()[0]

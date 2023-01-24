@@ -1,9 +1,18 @@
 import os
 import sys
 import jwt
+import pwinput
 import requests
 
-SECRET = "etg64vtah7r6atw74afiar6jtw4rsetrset69c8s"
+prog_greeting = """
+██████╗ ███████╗███████╗████████╗██████╗ ███████╗████████╗███████╗
+██╔══██╗██╔════╝██╔════╝╚══██╔══╝██╔══██╗██╔════╝╚══██╔══╝██╔════╝
+██████╔╝█████╗  ███████╗   ██║   ██████╔╝█████╗     ██║   ███████╗
+██╔══██╗██╔══╝  ╚════██║   ██║   ██╔══██╗██╔══╝     ██║   ╚════██║
+██████╔╝███████╗███████║   ██║   ██████╔╝███████╗   ██║   ███████║
+╚═════╝ ╚══════╝╚══════╝   ╚═╝   ╚═════╝ ╚══════╝   ╚═╝   ╚══════╝
+                                                                  
+"""
 
 chelyad_greeting = """Please enter what do you want to do:
 1. List all available bets
@@ -33,15 +42,20 @@ admin_greeting = """Let us make your wish come true
 
 def main():
     flag = True
+    os.system("clear")
+    print(prog_greeting)
     choise = int(input("""Hello, before we can keep our dirty deals we've gotta to authorize.
 1. Authorize
 2. Register
-0. Exit """))
+0. Exit
+"""))
     token = ""
     match choise:
         case 1:
+            os.system("clear")
+            print(prog_greeting)
             login = input("Enter login: ")
-            password = input("Enter password: ")
+            password = pwinput.pwinput(prompt='Password: ')
             credentials = {
                 'login': login,
                 'password': password,
@@ -49,9 +63,11 @@ def main():
             r = requests.post('http://127.0.0.1:5000/log-in', json=credentials)
             token = r.cookies.get_dict()['token']
         case 2:
-            print("oh, sweety, it's ur first time, then i need to find some out about you")
+            os.system("clear")
+            print(prog_greeting)
+            print("oh, sweety, it's ur first time. . .")
             login = input("Enter login: ")
-            password = input("Enter password: ")
+            password = pwinput.pwinput(prompt='Password: ')
             credentials = {
                 'login': login,
                 'password': password,
@@ -61,8 +77,10 @@ def main():
         case 0:
             sys.exit()
 
-    data = jwt.decode(token, SECRET, "HS256")
+    data = jwt.decode(token, os.environ.get('SECRET'), "HS256")
     if data['login'] == 'Admin':
+        os.system("clear")
+        print(prog_greeting)
         print(f"Welcome back {data['login']}")
         while flag:
             print(admin_greeting)
@@ -86,8 +104,13 @@ def main():
                 case 0:
                     sys.exit()
     elif data['login'] in ("Vasya_Mask_of_Madness", "Stalker_1337"):
-        print(f"Welcome back {data['login']}")
+        os.system("clear")
+        print(prog_greeting)
+        balance = get_users_balance(token)
+        print(f"Welcome back {data['login']} with balanve of {balance}")
         while flag:
+            balance = get_users_balance(token)
+            print(f"Welcome back {data['login']} with balanve of {balance}")
             print(moderator_greeting)
             select = int(input("Make your choise buddy: "))
             match select:
@@ -106,8 +129,11 @@ def main():
                 case 0:
                     sys.exit()
     else:
-        print(f"Welcome back {data['login']}")
+        os.system("clear")
         while flag:
+            print(prog_greeting)
+            balance = get_users_balance(token)
+            print(f"Welcome back {data['login']} with balance of {balance}")
             print(chelyad_greeting)
             select = int(input("Make your choise: "))
             match select:
@@ -120,12 +146,14 @@ def main():
                 case 4:
                     list_my_bets(token)
                 case 0:
+                    print("Hope 2 see u again")
                     sys.exit()
 
 def list_bets(token):
     """List all available bets"""
     cookie = {"token":token}
     r = requests.get('http://127.0.0.1:5000/bets', cookies=cookie)
+    os.system("clear")
     print(r.json())
 
 def make_a_bet(token):
@@ -140,24 +168,28 @@ def make_a_bet(token):
                 }
     cookie = {"token":token}
     r = requests.post("http://127.0.0.1:5000/bets", json=bet_info, cookies=cookie)
+    os.system("clear")
     print(r.json())
 
 def see_bets_history():
     """See events history"""
     r = requests.get("http://127.0.0.1:5000/bets/history")
+    os.system("clear")
     print(r.json())
 
 def list_my_bets(token):
     """List all my bets"""
-    select = int(input("""1. See active bets \n2. See paid bets"""))
+    select = int(input("""1. See active bets \n2. See paid bets \n"""))
     match select:
         case 1:
             cookie = {"token":token}
             r = requests.get("http://127.0.0.1:5000/my-bets/active", cookies=cookie)
+            os.system("clear")
             print(r.json())
         case 2:
             cookie = {"token":token}
             r = requests.get("http://127.0.0.1:5000/my-bets/paid", cookies=cookie)
+            os.system("clear")
             print(r.json())
 
 def moderate_users(token):
@@ -192,6 +224,11 @@ def make_payback(token):
     winner = int(input("Enter winner(1/2): "))
     data = {"event_id":event_id, "winner":winner}
     r = requests.post("http:127.0.0.1:5000/utils/payback", json=data, cookies=cookie)
+
+def get_users_balance(token):
+    cookie = {"token":token}
+    r = requests.get("http://127.0.0.1:5000/utils/balance", cookies=cookie)
+    return r.text
 
 if __name__ == "__main__":
     main()
