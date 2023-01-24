@@ -13,9 +13,9 @@ def moder_required(func):
         return func(*args, **kwargs)
     return wrapper
 
-team_ns = Namespace("team")
+team_ns = Namespace("teams")
 
-team_ns.route("/")
+@team_ns.route("/")
 class TeamsViews(Resource):
     @moder_required
     def get(self):

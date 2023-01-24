@@ -48,7 +48,8 @@ class UtilsUsers(Resource):
         """Set a balance to some user(alternative deposit)"""
         req_json = request.get_json()
         with sqlite3.connect("coursework.db") as connection:
-            cursor = connection.cursor("UPDATE users SET balance = %d;"%(req_json["balance"]))
+            cursor = connection.cursor()
+            cursor.execute("UPDATE users SET balance = %d WHERE login = '%s';"%(req_json["balance"], req_json['login']))
             connection.commit()
             return  "Successful", 200
        
