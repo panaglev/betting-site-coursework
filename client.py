@@ -105,7 +105,7 @@ def main():
                 case 0:
                     sys.exit()
 
-            data = jwt.decode(token, os.environ.get('SECRET'), "HS256")
+            data = jwt.decode(token, os.environ.get('SECRET'), "HS256") # FIX THIS AND MAKE DECODE ON SERVER SIDE
             if data['login'] == 'Admin':
                 os.system("clear")
                 while flag:
@@ -138,6 +138,7 @@ def main():
             elif data['login'] in ("Vasya_Mask_of_Madness", "Stalker_1337"):
                 os.system("clear")
                 while flag:
+					print(prog_greeting)
                     balance = get_users_balance(token)
                     print(f"Welcome back {data['login']} with balanve of {balance}")
                     print(moderator_greeting)

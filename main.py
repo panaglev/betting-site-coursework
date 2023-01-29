@@ -23,4 +23,4 @@ def configure_app(app):
 if __name__ == "__main__":
     app = create_app()
     configure_app(app)
-    app.run(debug=True, host='0.0.0.0')
+    app.run(host='0.0.0.0')
